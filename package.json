@@ -1,0 +1,24 @@
+{
+  "name": "interactive-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "build": "webpack watch --mode=development --config webpack.config.js",
+    "prod": "webpack --mode=production --config webpack.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.throttle": "^4.1.1",
+    "node-polyfill-webpack-plugin": "^2.0.0",
+    "three": "^0.142.0",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.21"
+  }
+}
