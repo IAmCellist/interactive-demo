@@ -3,23 +3,23 @@ import { createCamera } from "./components/camera";
 import { createScene } from "./components/scene";
 import { createLight } from "./components/light";
 import { createOrbitControls } from "./components/orbitcontrols";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { createCylinder } from "./components/cylinder";
+import { Loop } from "./systems/Loop";
 import { ARButton } from "three/examples/jsm/webxr/ARButton";
 import { createReticle } from "./components/reticle";
 import { createLoader } from "./components/gltfloader";
 
 import { createRenderer } from "./systems/renderer";
 import { Resizer } from "./systems/Resizer";
-import  _  from "lodash";
 
 let camera, scene, renderer;
 let controls;
 let controller;
+let loop;
 let reticle;
 let currentObject;
 let hitTestSource = null;
 let hitTestSourceRequested = false;
+let touchDown, touchX, touchY, deltaX, deltaY;
 
 class World {
     constructor(container) {
@@ -28,35 +28,42 @@ class World {
         camera = createCamera();
         scene = createScene();
         renderer = createRenderer();
+        loop = new Loop(camera, scene, renderer);
         container.appendChild(renderer.domElement);
 
+        //Create lights and controls
         const light = createLight();
+        const light2 = new THREE.RectAreaLight("white", 1, 5, 5);
+        light2.position.set(0, 0, 2);
         light.position.set(0.5, 1, 0.25);
-        scene.add(light);
+        scene.add(light, light2);
+        controls = createOrbitControls(camera, renderer.domElement)
+        loop.updateables.push(controls);
+        controls.addEventListener('change', this.render);
+
+        //Resizer
+        const resizer = new Resizer(container, camera, renderer);
 
         //Create ARButton and add to DOM
-        document.body.appendChild( ARButton.createButton(renderer, { requiredFeatures: [ 'hit-test' ] } ) );
+        let options = {
+            requiredFeatures: ['hit-test'],
+            optionalFeatures: ['dom-overlay'],
+        }
+
+        options.domOverlay = { root: document.getElementById('content')};
+
+        document.body.appendChild( ARButton.createButton(renderer, options));
 
         //Controller
         controller = renderer.xr.getController(0);
         controller.addEventListener("select", this.onSelect);
         scene.add(controller);
 
-        //Resizer
-        const resizer = new Resizer(container, camera, renderer);
-        resizer.onResize = () => {
-             this.render;
-        }
-
         //Reticle 
         reticle = createReticle();
         reticle.visible = false;
         reticle.matrixAutoUpdate = false;
         scene.add(reticle);
-
-        //OrbitControls
-        controls = createOrbitControls(camera, renderer.domElement)
-        controls.addEventListener('change', this.render);
         
         //Load models
         
@@ -64,44 +71,42 @@ class World {
 
         for (const model of models) {
             model.addEventListener('click', () => {
-                if (currentObject != null) {
+                if (currentObject != undefined) {
+
                     scene.remove(currentObject);
+
                 }
-                this.loadModel(model.getAttribute("id"), this.render);
+                
+                // this.loadModel(model.getAttribute("id"), this.render);
+                this.init(model.getAttribute("id"));
     
             });
         }
 
-        //Hide object in ARMode
+        //Hide object upon entering ARMode
         document.getElementById("ARButton").addEventListener("click", () => {
             console.log("ARObject hidden")
             currentObject.visible = false;
-        })
+        });
 
+        //TODO: Add rotation functionality to AR
     }
 
-    loadModel(model, render) {
+    async init(id) {
         const loader = createLoader();
-        loader.load(
-            model + ".glb",
-            function( glb ) {
-
-                currentObject = glb.scene;
-                scene.add(currentObject);
-                const box = new THREE.Box3().setFromObject(currentObject);
-                const center = new THREE.Vector3();
-                box.getCenter(center);
-                currentObject.position.sub(center);
-                scene.add(currentObject);
-                controls.update();
-                render()
-                
-            }
-        );
+        const modelData = await loader.loadAsync(`${id}` + ".glb");
+        currentObject = modelData.scene;
+        // this.onSelect;
+        let box = new THREE.Box3().setFromObject(currentObject);
+        let center = new THREE.Vector3();
+        box.getCenter( center );
+        currentObject.position.sub( center );
+        scene.add(currentObject);
     }
 
     onSelect() {
         if ( reticle.visible ) {
+            //Cylinder Test
             // const cylinder = createCylinder();
             // reticle.matrix.decompose(cylinder.position, cylinder.quaternion, cylinder.scale);
             // cylinder.scale.y = Math.random() * 2 + 1;
@@ -112,10 +117,12 @@ class World {
         }
     }
 
-    animate() {
+    start() {
+        loop.start(this.render);
+    }
 
-        renderer.setAnimationLoop(this.render);
-
+    stop() {
+        loop.stop();
     }
 
     render( timestamp, frame ) {

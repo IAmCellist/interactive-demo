@@ -1,7 +1,6 @@
 {
   "name": "interactive-demo",
   "version": "1.0.0",
-  "description": "",
   "main": "webpack.config.js",
   "scripts": {
     "build": "webpack watch --mode=development --config webpack.config.js",
@@ -20,5 +19,14 @@
     "lodash": "^4.17.21",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IAmCellist/interactive-demo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IAmCellist/interactive-demo/issues"
+  },
+  "homepage": "https://github.com/IAmCellist/interactive-demo#readme",
+  "description": ""
 }

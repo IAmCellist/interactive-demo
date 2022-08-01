@@ -10,18 +10,18 @@
     <script src="./dist/bundle.js" defer></script>
 </head>
 <body>
+    <div id="content">
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a class="ar-object" id="centrifuge" href="#">Centrifuge</a>
+            <a class="ar-object" id="tipbox" href="#">Tip Box</a>
+            <a class="ar-object" id="untitled" href="#">Centrifuge Test</a>
+            <a class="ar-object" id="4" href="#">Item 4</a>
+        </div>
 
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a class="ar-object" id="1" href="#">Item 1</a>
-        <a class="ar-object" id="2" href="#">Item 2</a>
-        <a class="ar-object" id="3" href="#">Item 3</a>
-        <a class="ar-object" id="4" href="#">Item 4</a>
-    </div>
-
-    <div id="scene-container" style="position: fixed;"></div>
-    
-    <span style="font-size:30px;cursor:pointer; position: fixed;" onclick="openNav()">&#9776;</span>
-
+        <div id="scene-container" style="position: fixed;"></div>
+        
+        <span style="font-size:30px;cursor:pointer; position: fixed;" onclick="openNav()">&#9776;</span>
+    </div>  
 </body>
 </html>
