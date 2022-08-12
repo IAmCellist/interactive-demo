@@ -33,10 +33,24 @@ class World {
 
         //Create lights and controls
         const light = createLight();
-        const light2 = new THREE.RectAreaLight("white", 1, 5, 5);
-        light2.position.set(0, 0, 2);
-        light.position.set(0.5, 1, 0.25);
-        scene.add(light, light2);
+        light.position.set(0, 0, 0);
+        const helper = new THREE.HemisphereLightHelper(light, 1);
+        scene.add(light, helper);
+
+        const light2 = new THREE.DirectionalLight("white", 1);
+        light2.position.set(0, 1, 1);
+        light2.target.position.set(0, 0, 0);
+        light2.updateMatrixWorld();
+        const helper2 = new THREE.DirectionalLightHelper(light2, 1);
+        scene.add(light2, helper2);
+
+        const light3 = new THREE.DirectionalLight("white", 1);
+        light3.position.set(0, -1, -1);
+        light3.target.position.set(0, 0, 0);
+        light3.updateMatrixWorld();
+        const helper3 = new THREE.DirectionalLightHelper(light3, 1);
+        scene.add(light3, helper3);
+
         controls = createOrbitControls(camera, renderer.domElement)
         loop.updateables.push(controls);
         controls.addEventListener('change', this.render);
@@ -72,9 +86,21 @@ class World {
         for (const model of models) {
             model.addEventListener('click', () => {
                 if (currentObject != undefined) {
-
+                    
                     scene.remove(currentObject);
 
+                }
+
+                if (model.getAttribute("id") == "centrifuge") {
+                    console.log("it worked")
+                    light.intensity = 1;
+                    light2.intensity = 2;
+                    light3.intensity = 2;
+                }
+                else {
+                    light.intensity = 3;
+                    light2.intensity = 3;
+                    light3.intensity = 3;
                 }
                 
                 // this.loadModel(model.getAttribute("id"), this.render);
