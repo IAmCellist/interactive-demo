@@ -35,21 +35,21 @@ class World {
         const light = createLight();
         light.position.set(0, 0, 0);
         const helper = new THREE.HemisphereLightHelper(light, 1);
-        scene.add(light, helper);
+        scene.add(light );
 
         const light2 = new THREE.DirectionalLight("white", 1);
         light2.position.set(0, 1, 1);
         light2.target.position.set(0, 0, 0);
         light2.updateMatrixWorld();
         const helper2 = new THREE.DirectionalLightHelper(light2, 1);
-        scene.add(light2, helper2);
+        scene.add(light2);
 
         const light3 = new THREE.DirectionalLight("white", 1);
         light3.position.set(0, -1, -1);
         light3.target.position.set(0, 0, 0);
         light3.updateMatrixWorld();
         const helper3 = new THREE.DirectionalLightHelper(light3, 1);
-        scene.add(light3, helper3);
+        scene.add(light3);
 
         controls = createOrbitControls(camera, renderer.domElement)
         loop.updateables.push(controls);
@@ -92,7 +92,6 @@ class World {
                 }
 
                 if (model.getAttribute("id") == "centrifuge") {
-                    console.log("it worked")
                     light.intensity = 1;
                     light2.intensity = 2;
                     light3.intensity = 2;
@@ -116,6 +115,39 @@ class World {
         });
 
         //TODO: Add rotation functionality to AR
+        renderer.domElement.addEventListener("touchstart", function(e) {
+            console.log("touchstart!");
+            e.preventDefault();
+            touchDown = true;
+            touchX = e.touches[0].pageX;
+            touchY = e.touches[0].pageY;   
+        }, false);
+
+        renderer.domElement.addEventListener("touchend", function(e) {
+            e.preventDefault();
+            touchDown = false; 
+        }, false);
+
+        renderer.domElement.addEventListener("touchmove", function(e) {
+            e.preventDefault();
+            if (!touchDown) {
+                return;
+            }
+
+            deltaX = e.touches[0].pageX - touchX;
+            deltaY = e.touches[0].pageY - touchY;
+            touchX = e.touches[0].pageX;
+            touchY = e.touches[0].pageY;
+
+            let rotateObject = () => {
+                if (currentObject && reticle.visible) {
+                    currentObject.rotation.y += deltaX / 100;
+                }
+            }
+            rotateObject();
+        }, false);
+
+
     }
 
     async init(id) {
