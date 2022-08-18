@@ -108,12 +108,18 @@ class World {
             });
         }
 
-        //Hide object upon entering ARMode
+        // Hide object upon entering ARMode
         document.getElementById("ARButton").addEventListener("click", () => {
-            console.log("ARObject hidden")
+            console.log("ARObject hidden");
+            exitButton.style.display = "flex";
             currentObject.visible = false;
         });
 
+        //Add exit button to ARMode
+        let exitButton = document.createElement("button");
+        exitButton.setAttribute("id", "ar-exit");
+        document.body.appendChild(exitButton);
+        
         //TODO: Add rotation functionality to AR
         renderer.domElement.addEventListener("touchstart", function(e) {
             console.log("touchstart!");
